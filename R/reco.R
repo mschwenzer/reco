@@ -1,3 +1,4 @@
+# * get_a.df
 ##' get_a.df
 ##'
 ##' return a.df from reco env
@@ -5,12 +6,13 @@
 ##' @param string 
 ##' @return a.df  
 ##' @author Marc Schwenzer
+##' @importFrom dplyr %>% 
 get_a.df <- function(string)
 {
 get('a.df',inherits='TRUE')
 }
 
-
+# * set_a.df
 ##' set_a.df
 ##'
 ##' set a.df from reco env
@@ -18,11 +20,13 @@ get('a.df',inherits='TRUE')
 ##' @param string 
 ##' @return Null
 ##' @author Marc Schwenzer
+##' @importFrom dplyr %>% 
 set_a.df <- function(val)
 {
     assign('a.df',val,inherits=TRUE)
 }
 
+# * validate_df_structure
 ##' validate_df_structure
 ##'
 ##' Check if the file has the correct format
@@ -30,10 +34,11 @@ set_a.df <- function(val)
 ##' @param df a data.frame
 ##' @return df 
 ##' @author Marc Schwenzer
+##' @importFrom dplyr %>% 
 validate_df_structure <- function(df)
     {df}
 
-
+# * reco_filters
 ##' reco_filters
 ##'
 ##' filter conditions
@@ -41,10 +46,21 @@ validate_df_structure <- function(df)
 ##' @param x a vector
 ##' @return string modified by several possible filters
 ##' @author Marc Schwenzer
+##' @importFrom dplyr %>%
 reco_filters <- function(x)
-    {x}
+{
+    if(exists('reco_filter'))
+    {
+        x %>% reco_filter -> x
+    }
+    else
+    {
+        x
+    }
+    x
+}
 
-
+# * load_file_or_create_it
 ##' load_file_or_create_it
 ##'
 ##' Load a data.frame or return NULL.
@@ -52,6 +68,9 @@ reco_filters <- function(x)
 ##' @param file 
 ##' @return 
 ##' @author Marc Schwenzer
+##' @importFrom rio export
+##' @importFrom rio import
+##' @importFrom dplyr %>%
 load_df_or_create_it <- function(file)
 {
     if(file %>% file.exists)
@@ -68,21 +87,31 @@ load_df_or_create_it <- function(file)
     a.df
 }
 
+
+# * reco
 ##' reco
 ##'
 ##' free and easy recode string based on a file
 ##' @title 
-##' @param string 
-##' @param file 
+##' @param string The string to recode
+##' @param file The file where the replacements are located. Columsn have to be named as from and to
+##' @param interactive If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is.
 ##' @return 
 ##' @author Marc Schwenzer
-reco <- function(string,file)
+##' @export
+##' @importFrom purrr map
+##' @importFrom dplyr %>% 
+reco <- function(string,file,interactive=TRUE)
 {
     load_df_or_create_it(file)  %>% set_a.df
+    if (interactive)
+        {
     string %>% reco_filters  %>% unique  ->  x
+    x%in%get_a.df()[,1] %>% sum %>% `-`(length(x),.)  %>% cat(.,' values to recode...\n')
     # add a reference to this environment to the x string
                                         # were to modify x
     x%>% map(~reco_do(string=.))
+    }
     get_a.df()[,2] -> replacements
     get_a.df()[,1] -> names(replacements)
     replacements[string] -> string
@@ -90,9 +119,7 @@ reco <- function(string,file)
     string
 }
 
-
-
-
+# * reco_do
 ##' reco_do
 ##'
 ##' decide if ask_string_write_to_file is necessary
@@ -101,6 +128,7 @@ reco <- function(string,file)
 ##' @param a.df
 ##' @return 
 ##' @author Marc Schwenzer
+##' @importFrom dplyr %>% 
 reco_do <- function(string)
 {
         if(nrow(get_a.df())<1)
@@ -113,10 +141,16 @@ reco_do <- function(string)
         )
     }
     }
-                                        #                           
- 
 
-
+# * ask_string_write_to_file
+##' ask_string_write_to_file
+##'
+##' ask_string_write_to_file
+##' @title ask_string_write_to_file
+##' @param string 
+##' @return 
+##' @author Marc Schwenzer
+##' @importFrom dplyr %>%
 ask_string_write_to_file<- function(string){
     suggest_based_on_df(string) -> new.string
     get_a.df() %>% attr('file') -> file
@@ -130,7 +164,15 @@ ask_string_write_to_file<- function(string){
     set_a.df(a.df.new)
 }
 
-
+# * suggest_based_on_df
+##' suggest_based_on_df
+##'
+##' suggest_based_on_df
+##' @title suggest_based_on_df
+##' @param string 
+##' @return 
+##' @author Marc Schwenzer
+##' @importFrom dplyr %>%
 suggest_based_on_df <- function(string)
 {
     cat(paste0('Choose Alternative for `',string[1],'`\n'))
@@ -152,3 +194,9 @@ suggest_based_on_df <- function(string)
     }
     input
 }
+# * Filevars
+# Local Variables:
+# orgstruct-heading-prefix-regexp: "# "
+# eval: (orgstruct++-mode)
+# eval: (orgstruct-hijacker-org-shifttab 1)
+# End:
