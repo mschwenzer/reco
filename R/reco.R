@@ -36,8 +36,9 @@ set_a.df <- function(val)
 ##' @author Marc Schwenzer
 ##' @importFrom dplyr %>% 
 validate_df_structure <- function(df)
-    {df}
-
+    {
+        df
+    }
 # * reco_filters
 ##' reco_filters
 ##'
@@ -95,7 +96,7 @@ load_df_or_create_it <- function(file)
 ##' @title 
 ##' @param string The string to recode
 ##' @param file The file where the replacements are located. Columsn have to be named as from and to
-##' @param interactive If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is.
+##' @param interactive If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.
 ##' @return 
 ##' @author Marc Schwenzer
 ##' @export
@@ -154,6 +155,8 @@ reco_do <- function(string)
 ask_string_write_to_file<- function(string){
     suggest_based_on_df(string) -> new.string
     get_a.df() %>% attr('file') -> file
+    if (new.string!='')
+        {
     bind_rows(get_a.df(),
               data.frame(from=string,to=new.string)
               ) -> a.df.new
@@ -161,6 +164,7 @@ ask_string_write_to_file<- function(string){
  #   print(a.df.new)
     file -> attr(a.df.new,'file')
     a.df.new %>% export(file=file)
+    }
     set_a.df(a.df.new)
 }
 
@@ -184,13 +188,17 @@ suggest_based_on_df <- function(string)
             print(alt.tab)
         }
     '' -> input
-    while(input==''|input==0)
-        {
             scan(what=character(),n=1) -> input
-            }
-    if(input  %>% as.numeric %>% is.na  %>% `!`)
+     if(input  %>% as.numeric %>% is.na  %>% `!`)
     {
+        if(input==0)
+            {
+                string-> input
+                }
+        else
+            {
         alt.tab$alt[which(alt.tab$num%in%(input %>% as.numeric) )] -> input
+        }
     }
     input
 }
