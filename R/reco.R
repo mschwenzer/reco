@@ -97,12 +97,13 @@ load_df_or_create_it <- function(file)
 ##' @param string The string to recode
 ##' @param file The file where the replacements are located. Columsn have to be named as from and to
 ##' @param interactive If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.
+##' @param tab Wheter to print the tab of alternatives/categories in every step.
 ##' @return 
 ##' @author Marc Schwenzer
 ##' @export
 ##' @importFrom purrr map
 ##' @importFrom dplyr %>% 
-reco <- function(string,file,interactive=TRUE)
+reco <- function(string,file,interactive=TRUE,tab=TRUE)
 {
     load_df_or_create_it(file)  %>% set_a.df
     if (interactive)
@@ -111,7 +112,7 @@ reco <- function(string,file,interactive=TRUE)
     x%in%get_a.df()[,1] %>% sum %>% `-`(length(x),.)  %>% cat(.,' values to recode...\n')
     # add a reference to this environment to the x string
                                         # were to modify x
-    x%>% map(~reco_do(string=.))
+    x%>% map(~reco_do(string=.,tab=tab))
     }
     get_a.df()[,2] -> replacements
     get_a.df()[,1] -> names(replacements)
@@ -130,7 +131,7 @@ reco <- function(string,file,interactive=TRUE)
 ##' @return 
 ##' @author Marc Schwenzer
 ##' @importFrom dplyr %>% 
-reco_do <- function(string)
+reco_do <- function(string,tab=TRUE)
 {
         if(nrow(get_a.df())<1)
     {
@@ -138,8 +139,8 @@ reco_do <- function(string)
     }
     else
     {
-        ifelse(string%in%get_a.df()[,1],'ok',ask_string_write_to_file(string)
-        )
+#        print(string)
+                if(string%in%get_a.df()[,1] %>% `!`) {ask_string_write_to_file(string,tab=tab)}
     }
     }
 
@@ -152,8 +153,8 @@ reco_do <- function(string)
 ##' @return 
 ##' @author Marc Schwenzer
 ##' @importFrom dplyr %>%
-ask_string_write_to_file<- function(string){
-    suggest_based_on_df(string) -> new.string
+ask_string_write_to_file<- function(string,tab=TRUE){
+    suggest_based_on_df(string,tab=tab) -> new.string
     get_a.df() %>% attr('file') -> file
     if (new.string!='')
         {
@@ -164,8 +165,8 @@ ask_string_write_to_file<- function(string){
  #   print(a.df.new)
     file -> attr(a.df.new,'file')
     a.df.new %>% export(file=file)
-    }
     set_a.df(a.df.new)
+    }
 }
 
 # * suggest_based_on_df
@@ -177,19 +178,29 @@ ask_string_write_to_file<- function(string){
 ##' @return 
 ##' @author Marc Schwenzer
 ##' @importFrom dplyr %>%
-suggest_based_on_df <- function(string)
+suggest_based_on_df <- function(string,tab=TRUE)
 {
+    if (tab)
+        {
     cat(paste0('Choose Alternative for `',string[1],'`\n'))
+    }
+    else
+        {
+    cat(paste0('`',string[1],'`: '))
+            }
     get_a.df()[,2] -> alternatives
     alternatives %>% unique -> alternatives
     if(length(alternatives)>0)
         {
             data.frame(num=1:length(alternatives),alt=alternatives) -> alt.tab
-            print(alt.tab)
+            if(tab){print(alt.tab)}
         }
     '' -> input
-            scan(what=character(),n=1) -> input
-     if(input  %>% as.numeric %>% is.na  %>% `!`)
+            scan(what=character(),nlines=1) -> input
+    if(length(input)>1){paste0(input,collapse=' ') -> input}
+    if(input %>% length %>% `>`(0))
+        {
+    if(input  %>% as.numeric %>% is.na  %>% `!`)
     {
         if(input==0)
             {
@@ -200,6 +211,11 @@ suggest_based_on_df <- function(string)
         alt.tab$alt[which(alt.tab$num%in%(input %>% as.numeric) )] -> input
         }
     }
+    }
+    else
+    {
+        '' -> input
+        }
     input
 }
 # * Filevars
