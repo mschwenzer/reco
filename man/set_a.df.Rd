@@ -2,7 +2,7 @@
 % Please edit documentation in R/reco.R
 \name{set_a.df}
 \alias{set_a.df}
-\title{.. content for \description{} (no empty lines) ..}
+\title{set_a.df}
 \usage{
 set_a.df(val)
 }
@@ -13,11 +13,9 @@ set_a.df(val)
 Null
 }
 \description{
-set_a.df
-}
-\details{
 set a.df from reco env
 }
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

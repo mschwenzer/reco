@@ -13,11 +13,9 @@ validate_df_structure(df)
 df
 }
 \description{
-validate_df_structure
-}
-\details{
 Check if the file has the correct format
 }
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

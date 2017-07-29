@@ -4,7 +4,7 @@
 \alias{reco_do}
 \title{reco_do}
 \usage{
-reco_do(string)
+reco_do(string, tab = TRUE)
 }
 \arguments{
 \item{string}{}
@@ -18,3 +18,4 @@ decide if ask_string_write_to_file is necessary
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

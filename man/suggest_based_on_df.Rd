@@ -4,10 +4,7 @@
 \alias{suggest_based_on_df}
 \title{suggest_based_on_df}
 \usage{
-suggest_based_on_df(string)
-}
-\arguments{
-\item{string}{}
+suggest_based_on_df(string, tab = TRUE)
 }
 \description{
 suggest_based_on_df
@@ -18,3 +15,4 @@ suggest_based_on_df
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/reco.R
 \name{get_a.df}
 \alias{get_a.df}
-\title{.. content for \description{} (no empty lines) ..}
+\title{return a.df from reco env}
 \usage{
 get_a.df(string)
 }
@@ -13,11 +13,9 @@ get_a.df(string)
 a.df
 }
 \description{
-get_a.df
-}
-\details{
-return a.df from reco env
+##' get_a.df
 }
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

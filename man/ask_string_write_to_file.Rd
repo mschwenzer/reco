@@ -4,10 +4,7 @@
 \alias{ask_string_write_to_file}
 \title{ask_string_write_to_file}
 \usage{
-ask_string_write_to_file(string)
-}
-\arguments{
-\item{string}{}
+ask_string_write_to_file(string, tab = TRUE)
 }
 \description{
 ask_string_write_to_file
@@ -18,3 +15,4 @@ ask_string_write_to_file
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

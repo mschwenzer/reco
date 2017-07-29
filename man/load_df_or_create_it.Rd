@@ -10,11 +10,9 @@ load_df_or_create_it(file)
 \item{file}{}
 }
 \description{
-load_file_or_create_it
-}
-\details{
 Load a data.frame or return NULL.
 }
 \author{
 Marc Schwenzer
 }
+\keyword{internal}

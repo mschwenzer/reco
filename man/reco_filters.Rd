@@ -13,11 +13,9 @@ reco_filters(x)
 string modified by several possible filters
 }
 \description{
-reco_filters
-}
-\details{
 filter conditions
 }
 \author{
 Marc Schwenzer
 }
+\keyword{internal}
