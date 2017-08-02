@@ -199,11 +199,12 @@ suggest_based_on_df <- function(string,tab=TRUE)
     input
 }
 # * 🔴 reco
+#### ✳️ : also a replacement method for factors that changes the level order based on the occurence in the data.frame
 ##' Free and easy replace elements of a vector based on simple replacement files. 
 ##' 
 ##' @title reco
 ##' @param string The string to recode
-##' @param file The file where the replacements are located. Columsn have to be named as from and to
+##' @param file The file where the replacements are located. Columsn have to be named as from and to. If file is a data.frame, then this is used as replacement structure.
 ##' @param interactive If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.
 ##' @param tab Wheter to print the tab of alternatives/categories in every step.
 ##' @return a vector.
@@ -214,7 +215,15 @@ suggest_based_on_df <- function(string,tab=TRUE)
 
 reco <- function(string,file,interactive=TRUE,tab=TRUE)
 {
+    if(is.data.frame(file))
+       {
+           file %>% as.data.frame %>% set_a.df
+           interactive=FALSE
+           }
+       else
+               {
     load_df_or_create_it(file)  %>% set_a.df
+    }
     if (interactive)
         {
     string %>% reco_filters  %>% unique  ->  x
@@ -223,10 +232,28 @@ reco <- function(string,file,interactive=TRUE,tab=TRUE)
                                         # were to modify x
     x%>% map(~{reco_do(string=.x,tab=tab)})
     }
+    if(is.character(string))
+       {
     get_a.df()[,2] -> replacements
     get_a.df()[,1] -> names(replacements)
     replacements[string] -> string
     NULL -> names(string)
+    }
+    if(is.numeric(string))
+        {
+   get_a.df()[,2]  %>% as.numeric                 -> replacements
+                get_a.df()[,1] %>% as.numeric -> origvals
+if(is.double(string))
+    {
+           paste0('`',origvals,'`=',replacements,collapse=',')                 %>% str_replace_all('=NA','=NA_real_')  %>% str_replace('`NA`=','.missing=')-> code
+}
+   else
+       {
+           paste0('`',origvals,'`=',replacements,'L',collapse=',')                 %>% str_replace('=NA','=NA_integer_')  %>% str_replace('`NA`=','.missing=')  -> code
+}
+   code %>%  paste('string %>%  recode(.,',.,')  -> string')  -> code
+            eval(parse(text=code))
+            }
     string
 }
 # * 🔴 str_replace_by_df
