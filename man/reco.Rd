@@ -2,24 +2,27 @@
 % Please edit documentation in R/reco.R
 \name{reco}
 \alias{reco}
-\title{reco}
+\title{Free and easy replace elements of a vector based on simple replacement data.frames.}
 \usage{
-reco(string, file, interactive = TRUE, tab = TRUE)
+reco(input = NULL, replacements, interactive = TRUE, tab = FALSE,
+  class = NULL, not.matching = NULL)
 }
 \arguments{
-\item{string}{The string to recode}
+\item{input}{A input vector having class `character`, `numeric`, `integer`, `factor`.}
 
-\item{file}{The file where the replacements are located. Columsn have to be named as from and to. If file is a data.frame, then this is used as replacement structure.}
+\item{replacements}{The file where the replacements are located. Colums have to be named as from and to. If replacements is a data.frame, then this is used as replacement structure.}
 
 \item{interactive}{If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.}
 
 \item{tab}{Wheter to print the tab of alternatives/categories in every step.}
+
+\item{class}{The desired class of the output vector.}
 }
 \value{
 a vector.
 }
 \description{
-Free and easy replace elements of a vector based on simple replacement files.
+Reco will replace the input based on a data.frame either from a file or an data.frame given to the replacements argument. It is basically a wrapper to the dplyr::recode-function that does some previous conversions to guarantee that the format of the file/data.frame matches to the input string. If you specify interactive it can be used to recode interactively by appending values to the file.
 }
 \author{
 Marc Schwenzer

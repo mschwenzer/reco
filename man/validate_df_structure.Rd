@@ -13,7 +13,7 @@ validate_df_structure(df)
 df
 }
 \description{
-Check if the file has the correct format
+Check if the replacements has the correct format
 }
 \author{
 Marc Schwenzer
