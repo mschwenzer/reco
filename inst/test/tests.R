@@ -72,8 +72,19 @@ class.variants %>% map(
 1:10 %>% reco(tribble(~from,~to,     1,2.4,  2,3, 4,9 , 5,9),class='character')
 1:10 %>% reco(tribble(~from,~to,     1,NA,  2,'3', 4,'9' , 5,'9'),class='integer')
 
-c(1:10,NA)  %>% reco(tribble(~from,~to,   1,'okay',  1,'okay',  4,'3', 2,'9' , 5,'9',   NA,999),class='numeric') 
+c(1:10,'heinz','gert',NA)  %>% reco(tribble(~from,~to,   3,NA,  4,'3', 2,'9' , 5,'9',   NA,'okay'),class='numeric')
+c(1:10,'heinz','gert',NA)  %>% reco(tribble(~from,~to,   3,NA,  4,'3', 2,'9' , 5,'9',   NA,'okay'),class='character')
 
+c(1:10,'heinz','gert',NA)  %>% reco(tribble(~from,~to,   3,NA,  4,'3', 2,'9' , 5,'9',   NA,'okay'),class='character')
+
+c(1:10)  %>% reco(tribble(~from,~to, 'onkel',4 , 'heinz',3,  '4',3, 2,9 , 5,9,   NA,999),class='numeric') 
+1:10 %>% reco(testfr)
+tribble(~from,~to,   '3',3,  'heinz',3, 2,9 , 5,9,   NA,999) %>% map(~class(.))
+
+
+testfr<- data.frame(from=from.variants[[3]],to=to.variants[[4]])
+testfr
+1:10 %>% reco(testfr)
 
 testoutclass<- function(x,repl){expect_equal(class(repl$to),reco(x,repl) %>% class)}
 
