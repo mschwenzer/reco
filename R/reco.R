@@ -74,7 +74,7 @@ validate_df_structure <- function(df)
         c('from','to') -> names(df)
         duplicated(df$from) %>% which  -> duplicates
         if(length(duplicates)>0){
- #       print(df[duplicates,])
+        print(df[duplicates,])
         duplicates %>% map(~{
             (df$from%in%df$from[.x]) %>% which -> conflicting.rows
             df$from[conflicting.rows] %>% unique -> conflicting.froms
