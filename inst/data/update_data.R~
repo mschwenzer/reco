@@ -1,0 +1,17 @@
+require(dplyr)
+require(purrr)
+require(stringr)
+require(rio)
+'/doc/wissenschaft/rpackages/reco/inst/data' -> datapath
+dir(datapath,full=1,pattern='csv$')  -> datafiles
+#print(datafiles)
+datafiles %>% walk(~{
+#    print(.x)
+    .x  %>% str_replace(paste0(datapath,'/'),'') %>% str_replace('.csv','') -> datasetname
+                                        #    print(datasetname)
+    cat('Installing dataset: ',datasetname,'\n')
+    assign(datasetname,    import(.x))
+    paste0('save(',datasetname,',file="',datapath %>% str_replace('/inst',''),'/',datasetname,'.dta")') -> code
+ #   print(code)
+    eval(parse(text=code))
+    })

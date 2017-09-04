@@ -1,0 +1,106 @@
+library(testthat)
+expect_equal(1:10,reco(1:10,data.frame(from=1:10,to=1:10)))
+expect_equal(1:10 %>% class,reco(1:10,data.frame(from=1:10,to=1:10)) %>% class)
+
+
+expect_equal(as.character(1:10),reco(1:10,data.frame(from=1:10,to=as.character(1:10))))
+expect_equal(as.character(1:10),reco(1:10,data.frame(from=1:10,to=as.character(1:10))))
+expect_equal(as.character(1:10) %>% class,reco(1:10,data.frame(from=1:10,to=as.character(1:10))) %>% class)
+
+expect_equal(as.character(1:10) %>% class,reco(1:10 %>% as.character,data.frame(from=1:10,to=as.character(1:10))) %>% class)
+# class determined by to, coercion when the input is character and the to ist integer
+expect_equal(reco(1:10 %>% as.character,data.frame(from=1:10,to=as.character(1:10))) %>% class,'character')
+# class determined by to, coercion when the input is integer and the to ist character
+expect_equal(reco(1:10,data.frame(from=1:10 %>% as.character,to=as.character(1:10))) %>% class,'character')
+# class determined by to, coercion when the input is integer and the to ist character
+expect_equal(reco(1:10,) %>% class,'character')
+
+
+x<- 1:10
+
+# outclass is the same as class of to
+testoutclass<- function(x,repl){expect_equal(class(repl$to),reco(x,repl) %>% class)}
+
+# from is integer, to is character, 
+data.frame(from=1:10 %>% as.character,to=as.character(1:10)) -> repl
+                                        # orig is integer
+1:10  %>% testoutclass(repl)
+1:10 %>% as.character %>% testoutclass(repl)
+1:10 %>% as.factor %>% testoutclass(repl)
+# !!!! ◼  factors not working by now
+
+# from is integer, to is intger
+data.frame(from=1:10,to=1:10) -> repl
+                                        # orig is integer
+1:10  %>% testoutclass(repl)
+                                        # orig is character
+1:10 %>% as.character %>% testoutclass(repl)
+#1:10 %>% as.factor %>% testoutclass(repl)
+
+
+# to is intger, from is integer
+data.frame(from=1:10,to=1:10) -> repl
+                                        # orig is integer
+1:10  %>% testoutclass(repl)
+                                        # orig is character
+1:10 %>% as.character %>% testoutclass(repl)
+#1:10 %>% as.factor %>% testoutclass(repl)
+
+
+
+# input integer
+1:10
+# to is integer, from is character
+data.frame(from=1:10 %>% as.character,to=1:10) -> repl
+
+
+
+"Medizinische Fachangestellte / \\Arzthelferin\\" %>% recoder.suggestion(isco08_de)
+"Medizinische Fachangestellte / \\Arzthelferin\\" %>% rec(debug=1,recodes='isco08_de')
+'Sachverständiger für KFZ Mechank (Dipl. Ing.)' %>% rec(debug=1,recodes='isco08_de')
+'Lehrerin (Grund- und Hauptschule)' %>% rec(debug=1,recodes='isco08_de')
+'' %>% rec(debug=1,recodes='isco08_de')
+'' %>% recoder.suggestion(isco08_de,debug=1)
+
+    c('Und','bla') %>% remove.seperator.words
+grepl('[uU]nd',c('und','bla','und'))
+str_detect(pattern='[uU]nd',c('und','bla','und'))
+Grund-
+recoder.suggestion( '\\'  ,isco08_de)
+recoder.suggestion( 'Medizinische Fachangestellte /'  ,isco08_de)
+
+recoder.suggestion
+recoder.suggestion( 'Dach\\ Tisch'  ,isco08_de,debug=TRUE)
+remove.brackets.and.colons('Dach \\ Tisch')
+isco08_de[470,]
+
+test_that('recoder.suggestion',
+          {
+          expect_false(try(recoder.suggestion( '\\'  ,isco08_de),silent=TRUE) %>% class=='try-error')
+          expect_equal(recoder.suggestion( '\\'  ,isco08_de),NULL)
+          expect_is(recoder.suggestion( 'Dach Tisch'  ,isco08_de),'data.frame')
+          expect_error(recoder.suggestion(1:10  ,isco08_de))
+          expect_error(recoder.suggestion(data.frame(as.character(1:10))  ,isco08_de))
+          expect_error(recoder.suggestion(list('a','b')  ,isco08_de))
+          expect_is(recoder.suggestion( 'ʛ'  ,isco08_de),'data.frame')          
+      }
+)
+
+recoder.suggestion( 'ʛ'  ,isco08_de,debug=TRUE)
+options(error=print)
+recoder.suggestion( 'Dach \\ Tisch'  ,isco08_de,debug=1)
+
+-> a
+a <- TRUE
+?expect_false(a)
+?expect_true
+
+!='try-error') %>% as.logical
+expect_error(
+
+# * Emacs Filevariables (Irrelevant to Non-Emacs-Users)
+# Local Variables:
+# orgstruct-heading-prefix-regexp: "# "
+# eval: (orgstruct++-mode)
+# eval: (orgstruct-hijacker-org-shifttab 1)
+# End:
