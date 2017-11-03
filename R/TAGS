@@ -1,0 +1,17 @@
+
+/Users/eur/Documents/wissenschaft/rpackages/reco/R//reco.R,427
+vvalidate_string_and_return_class9,281
+gget_a.df23,617
+sset_a.df38,861
+vvalidate_df_structure52,1182
+rreco_filters108,3414
+lload_df_or_create_it132,3824
+rreco_do160,4383
+aask_string_write_to_file183,4887
+ssuggest_based_on_df217,5756
+rreco276,8557
+sstr_replace_by_df437,15007
+rreco_replace_character447,15221
+rreco_replace_numeric466,15961
+ggenerate_recode_code485,16580
+ convert_to_class514,17791
