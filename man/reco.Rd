@@ -4,25 +4,35 @@
 \alias{reco}
 \title{Free and easy replace elements of a vector based on simple replacement data.frames.}
 \usage{
-reco(input = NULL, replacements, interactive = TRUE, tab = FALSE,
+reco(input = NULL, replacements, interactive = FALSE, tab = FALSE,
   class = NULL, not.matching = NULL)
 }
 \arguments{
 \item{input}{A input vector having class `character`, `numeric`, `integer`, `factor`.}
 
-\item{replacements}{The file where the replacements are located. Colums have to be named as from and to. If replacements is a data.frame, then this is used as replacement structure.}
+\item{replacements}{This argument defines how to replace values. The basic structure is a data.frame expected to have the columns f(rom) and t(o).\cr\cr
+If replacements is not a data.frame, there are several options:\cr
+- If replacements is a string with a path to a file readable by rio::import where the data.frame replacements are located.\cr
+- If replacements is the string 'labels' it will use the attributes() function to extract the labels-attribute, effectively replacing values by there corresponding labels (which e.g. are generated automatically when importing from Stata, SPSS, etc.).\cr
+- If replacements is a string that describes a data.frame in the reco package this will be used as replacement data.frame. See data(packages='reco') for the default data.frames.\cr
+- If replacements is a list (not of class data.frame) its elements will be evaluated from left to right as individual replacement by recursive calling reco. In effect you can wrap several recoding steps in a list, e.g replacements=list('labels','cnt_cnt3)') to first extract the labels from a country variable and then recode it to a 3 digit code.
+\cr
+Note that you can use reco in combination with e.g. giving data.frame(from=c(1,2,3,4),to=c(NA,2,4,5)) or tibble::tribble(~f,~t,   1,NA,   2,4,   5,8) as argument to replacements to instantly replace values without using a seperate R object in memory or in a file. If adequately spaced, the comma seperated variant of tribble is quite readable and very fast to enter.\cr
+\cr
+If the data.frame does not have columns named from and to it will use the first or second column but warn you.\cr}
 
-\item{interactive}{If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.}
+\item{interactive}{If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or just enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.}
 
 \item{tab}{Wheter to print the tab of alternatives/categories in every step.}
 
 \item{class}{The desired class of the output vector.}
 }
 \value{
-a vector.
+a vector of same class as replaments' `to` column or specified by the `class` argument.
 }
 \description{
-Reco will replace the input based on a data.frame either from a file or an data.frame given to the replacements argument. It is basically a wrapper to the dplyr::recode-function that does some previous conversions to guarantee that the format of the file/data.frame matches to the input string. If you specify interactive it can be used to recode interactively by appending values to the file.
+Reco will replace the input based on a data.frame either from a file or an data.frame given to the replacements argument. It is basically a wrapper to the dplyr::recode-function that does some previous conversions to guarantee that the format of the file/data.frame matches to the input string. If you specify interactive it can be used to recode interactively by appending values to the file.\cr
+If only replacements without input is given, reco will return the replacement data.frame for convenience.
 }
 \author{
 Marc Schwenzer

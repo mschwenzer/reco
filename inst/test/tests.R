@@ -13,21 +13,24 @@ expect_equal(as.character(1:10) %>% class,reco(1:10 %>% as.character,data.frame(
 expect_equal(reco(1:10 %>% as.character,data.frame(from=1:10,to=as.character(1:10))) %>% class,'character')
 # class determined by to, coercion when the input is integer and the to ist character
 expect_equal(reco(1:10,data.frame(from=1:10 %>% as.character,to=as.character(1:10))) %>% class,'character')
-# class determined by to, coercion when the input is integer and the to ist character
-expect_equal(reco(1:10,) %>% class,'character')
 
 
-x<- 1:10
+
 
 
 # * New Test
 # ** Define input variants
 c(1,2,3,4,5,6,7,8,9,10) -> an.integer.vector
+c(1,NA,3,4,5,6,7,8,9,10) -> an.integer.vector.with.NA
 c(1.4,2,3,4,5,6,7,8,9,10) -> an.real.vector
+c(1.4,2,NA,4,5,6,7,8,9,10) -> an.real.vector.with.NA
 an.integer.vector -> an.character.vector
 c('a','b') -> an.character.vector[3:4]
-list(an.integer.vector,an.real.vector,an.character.vector) -> input.variants
-list(an.integer.vector,an.real.vector,an.character.vector) -> from.variants
+an.character.vector -> an.character.vector.with.NA
+NA -> an.character.vector.with.NA[10]
+list(an.integer.vector,an.real.vector,an.character.vector,an.integer.vector.with.NA,an.character.vector.with.NA,an.real.vector.with.NA) -> from.variants
+list(an.integer.vector,an.real.vector,an.character.vector,an.integer.vector.with.NA,an.character.vector.with.NA,an.real.vector.with.NA) -> input.variants
+
 # ** Define to variants
 c(1,2,3,4,5,6,7,8,9,10)+1 -> an.integer.vector
 c(1.4,2,3,4,5,6,7,8,9,10)+1 -> an.real.vector
@@ -38,6 +41,7 @@ c(2,3,4,5,6,7,8,9,10,NA)+1 -> an.integer.vector.with.NA
 c('a','b') -> an.character.vector[3:4]
 an.character.vector[-10] %>% c(.,NA) ->     an.character.vector.with.na
 list(an.integer.vector,an.real.vector,an.character.vector,an.integer.vector.with.NA,an.character.vector.with.NA,an.real.vector.with.NA) -> to.variants
+
 # ** Define class variants
 list('numeric','character','integer',NULL) -> class.variants
 
@@ -63,7 +67,8 @@ class.variants %>% map(
         .x -> a.rep.frame
         cat('--------------------\ninput variant:',class(i),' rep.frame from:',class(a.rep.frame$from),' rep.frame to:',class(a.rep.frame$to),' class variant:',class.variant,'\n')
         reco(i,a.rep.frame,class=class.variant) -> recoout
-                print(i)
+        print(i)
+                print(a.rep.frame)
         print(recoout)
         expect_equal(ifelse(!is.null(class.variant),class.variant,class(a.rep.frame$to)),class(recoout))
     })})})

@@ -3,6 +3,7 @@
 export(reco)
 export(str_replace_by_df)
 importFrom(dplyr,"%>%")
+importFrom(dplyr,select)
 importFrom(purrr,map)
 importFrom(rio,export)
 importFrom(rio,import)
