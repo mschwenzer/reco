@@ -48,8 +48,8 @@ set_a.df <- function(val)
 ##' @keywords internal
 ##' @return df 
 ##' @author Marc Schwenzer
-##' @importFrom dplyr %>%
 ##' @importFrom dplyr select
+##' @importFrom dplyr %>%
 validate_df_structure <- function(df)
     {
         '' -> from_warning
@@ -71,8 +71,8 @@ validate_df_structure <- function(df)
         }
         else{
             cat('')}
-        df %>% select(fromcol,tocol)  %>% unique-> df
         c('from','to') -> names(df)
+        df %>% select(fromcol,tocol)  %>% unique-> df
         duplicated(df$from) %>% which  -> duplicates
         if(length(duplicates)>0){
         print(df[duplicates,])
