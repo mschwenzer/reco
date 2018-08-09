@@ -349,10 +349,12 @@ if(replacements %>% is.character)
 # *** Option 4: recode labels from attribute
             if(replacements=='labels')
             {
+#                browser()
                 if(!(is.null(input %>% attr('labels'))))
                 {
-                    input %>% attributes %>% .$labels -> labs
+                    input %>% attr('labels') -> labs
                     data.frame(from=labs,to=names(labs))  -> replacements
+                    replacements[,1] %>% is.na %>% which %>% {. -> a; replacements[-a,]} -> replacements
                     replacements %>% set_a.df
                     '`labels`-attribute of input'  -> the_source
                     interactive=FALSE
