@@ -48,7 +48,10 @@ set_a.df <- function(val)
 ##' @keywords internal
 ##' @return df 
 ##' @author Marc Schwenzer
+##' @importFrom purrr map
+##' @importFrom purrr map_chr
 ##' @importFrom dplyr select
+##' @importFrom stringr str_detect
 ##' @importFrom dplyr %>%
 validate_df_structure <- function(df)
     {
@@ -96,7 +99,8 @@ validate_df_structure <- function(df)
                 df[,2] %>% convert_to_class('numeric') -> df[,2]
              'numeric' -> df.class[2]
                 }
-        
+        # to be changed to attributes instead of list:
+        # a.df %>% {df.class -> attr(.,'class');.} %>% {paste0(from_warning,to_warning,collapse='',sep='') -> attr(.,'warningn');.}
         list(df,df.class,paste0(from_warning,to_warning,collapse='',sep=''))
     }
 # * reco_filters
@@ -137,6 +141,7 @@ load_df_or_create_it <- function(file)
     if(file %>% file.exists)
     {
         file  %>% import  -> a.df
+#        browser()
         file ->  attr(a.df,'file')
                 }
     else
@@ -182,6 +187,7 @@ reco_do <- function(string,tab=TRUE)
 ##' @keywords internal
 ##' @return 
 ##' @author Marc Schwenzer
+##' @importFrom dplyr bind_rows
 ##' @importFrom dplyr %>%
 ask_string_write_to_file<- function(string,tab=TRUE){
     suggest_based_on_df(string,tab=tab) -> new.string
@@ -264,8 +270,7 @@ suggest_based_on_df <- function(string,tab=TRUE)
 ##'
 ##' Reco will replace the input based on a data.frame either from a file or an data.frame given to the replacements argument. It is basically a wrapper to the dplyr::recode-function that does some previous conversions to guarantee that the format of the file/data.frame matches to the input string. If you specify interactive it can be used to recode interactively by appending values to the file.\cr
 ##' If only replacements without input is given, reco will return the replacement data.frame for convenience.
-
-##' @Title reco
+##' @title reco
 ##' @param input A input vector having class `character`, `numeric`, `integer`, `factor`.
 ##' @param replacements This argument defines how to replace values. The basic structure is a data.frame expected to have the columns f(rom) and t(o).\cr\cr
 ##' If replacements is not a data.frame, there are several options:\cr
@@ -284,6 +289,7 @@ suggest_based_on_df <- function(string,tab=TRUE)
 ##' @author Marc Schwenzer
 ##' @export
 ##' @importFrom purrr map
+##' @importFrom dplyr mutate_if
 ##' @importFrom dplyr %>% 
 reco <- function(input=NULL,replacements,interactive=FALSE,tab=FALSE,class=NULL,not.matching=NULL)
 {
@@ -349,12 +355,17 @@ if(replacements %>% is.character)
 # *** Option 4: recode labels from attribute
             if(replacements=='labels')
             {
-#                browser()
+
                 if(!(is.null(input %>% attr('labels'))))
                 {
+#                browser()                    
                     input %>% attr('labels') -> labs
                     data.frame(from=labs,to=names(labs))  -> replacements
+                    if((replacements[,1] %>% is.na %>% sum)>0)
+                        {
                     replacements[,1] %>% is.na %>% which %>% {. -> a; replacements[-a,]} -> replacements
+                    }
+#                    browser()
                     replacements %>% set_a.df
                     '`labels`-attribute of input'  -> the_source
                     interactive=FALSE
@@ -435,7 +446,7 @@ rm(class)
         }
 # ** Prepare replacement frame and input to match logic of dplyr::recode
 a.df %>% mutate_if(is.logical,as.double) -> a.df
-    # *** Set all classes
+        # *** Set all classes
     input %>% class -> input_class
     a.df.class[1] -> df_from_class
     a.df.class[2] -> df_to_class
@@ -517,7 +528,7 @@ is.na(a.df$from) %>% which -> current.nas_from
 #        print(new.nas.in.to)
 #((current.nas%in%orig.nas.in.to)&(current.nas%in%orig.nas.in.from)) %>% `!` %>% which %>% current.nas[.]  -> to.drop.from.a.df
 current.nas_from%in%orig.nas.in.from    %>% `!` %>% which %>% current.nas_from[.]  -> to.drop.from.a.df
-#    browser()
+                                        #    browser()
 if(length(to.drop.from.a.df)>0){
 a.df[-to.drop.from.a.df,] -> a.df
 }
@@ -530,6 +541,7 @@ a.df[-to.drop.from.a.df,] -> a.df
     generate_recode_code(a.df,df_from_class,df_to_class,not.matching) -> code
 #        cat(paste0('\nin: ',(class(input)),'\n'))
 #    print(code)
+
     eval(parse(text=code))
 #        cat(paste0('\nout: ',(class(input)),'\n'))
     if(desired_output_class!=(class(input))){
@@ -557,6 +569,16 @@ df %>% as.data.frame %>% {
 q %>% str_replace_all(rep.patterns)
 }
 # * DEPRECIATED reco_replace_character
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param string 
+##' @param a.df 
+##' @param a.df.class
+##' @importFrom dplyr mutate
+##' @return 
+##' @author Marc Schwenzer
 reco_replace_character<- function(string,a.df,a.df.class)
     {
         if(a.df.class[1]=='numeric')
@@ -595,6 +617,17 @@ reco_replace_numeric<- function(string,a.df,a.df.class)
 
 
 # * generate_recode_code: generate code for dplyr recode.
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param a.df 
+##' @param df_from_class 
+##' @param df_to_class 
+##' @param not.matching
+##' @importFrom stringr str_replace_all
+##' @return 
+##' @author Marc Schwenzer
 generate_recode_code<- function(a.df,df_from_class,df_to_class,not.matching)
 {
 
@@ -647,6 +680,7 @@ str_replace_all(regex('="*NA[L]*"*$'),paste0('=',switch(df_to_class,
 
 guarantee_numeric_are_same_class <- function(input,a.df)
     {
+#        browser()
         input %>% is.double -> inputdbl
         a.df$from %>% is.double -> adffromdbl
         a.df$to %>% is.double -> adftodbl

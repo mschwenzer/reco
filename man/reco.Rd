@@ -2,7 +2,7 @@
 % Please edit documentation in R/reco.R
 \name{reco}
 \alias{reco}
-\title{Free and easy replace elements of a vector based on simple replacement data.frames.}
+\title{reco}
 \usage{
 reco(input = NULL, replacements, interactive = FALSE, tab = FALSE,
   class = NULL, not.matching = NULL)
@@ -31,6 +31,9 @@ If the data.frame does not have columns named from and to it will use the first 
 a vector of same class as replaments' `to` column or specified by the `class` argument.
 }
 \description{
+Free and easy replace elements of a vector based on simple replacement data.frames.
+}
+\details{
 Reco will replace the input based on a data.frame either from a file or an data.frame given to the replacements argument. It is basically a wrapper to the dplyr::recode-function that does some previous conversions to guarantee that the format of the file/data.frame matches to the input string. If you specify interactive it can be used to recode interactively by appending values to the file.\cr
 If only replacements without input is given, reco will return the replacement data.frame for convenience.
 }
