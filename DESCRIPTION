@@ -12,7 +12,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    dplyr, purrr, rio, stringr
+    dplyr, purrr, rio, stringr, stargazer
 Suggests: 
     testthat
 RoxygenNote: 7.0.2
