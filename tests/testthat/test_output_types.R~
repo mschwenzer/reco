@@ -1,0 +1,19 @@
+context("Output class of vector")
+
+
+test_that("Output class conversion", {
+    expect_equal(1:10 %>% reco(tibble(from=1:10,to=2:11),class='character') %>% typeof, 'character')
+    expect_equal(1:10 %>% reco(tibble(from=1:10,to=2:11),class='numeric') %>% class, 'numeric')
+    expect_equal(1:10 %>% reco(tibble(from=1:10,to=2:11),class='real') %>% class, 'numeric')
+    expect_equal(1:10 %>% reco(tibble(from=1:10,to=2:11),class='integer') %>% class, 'integer')
+    expect_equal(1:10 %>% as.integer %>% reco(tibble(from=1:10,to=2:11),class='character') %>% typeof, 'character')
+    expect_equal(1:10 %>% as.integer %>% reco(tibble(from=1:10,to=2:11),class='numeric') %>% class, 'numeric')
+    expect_equal(1:10 %>% as.integer %>% reco(tibble(from=1:10,to=2:11),class='real') %>% class, 'numeric')
+    expect_equal(1:10 %>% as.integer %>% reco(tibble(from=1:10,to=2:11),class='integer') %>% class, 'integer')
+    expect_equal(1:10 %>% as.character %>% reco(tibble(from=1:10,to=2:11),class='character') %>% typeof, 'character')
+    expect_equal(1:10 %>% as.character %>% reco(tibble(from=1:10,to=2:11),class='numeric') %>% class, 'numeric')
+    expect_equal(1:10 %>% as.character %>% reco(tibble(from=1:10,to=2:11),class='real') %>% class, 'numeric')
+    expect_equal(1:10 %>% as.character %>% reco(tibble(from=1:10,to=2:11),class='integer') %>% class, 'integer')
+})
+
+
