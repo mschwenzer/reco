@@ -7,7 +7,7 @@
 load_df_or_create_it(file)
 }
 \arguments{
-\item{file}{}
+\item{file}{A file}
 }
 \description{
 Load a data.frame or return NULL.

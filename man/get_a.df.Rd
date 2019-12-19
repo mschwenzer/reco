@@ -7,7 +7,7 @@
 get_a.df(string)
 }
 \arguments{
-\item{string}{}
+\item{string}{a vector}
 }
 \value{
 a.df

@@ -7,7 +7,12 @@
 reco_do(string, tab = TRUE)
 }
 \arguments{
-\item{string}{}
+\item{string}{a vector}
+
+\item{a.df}{a data.frame}
+}
+\value{
+
 }
 \description{
 reco_do

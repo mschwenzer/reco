@@ -7,9 +7,11 @@
 reco_replace_character(string, a.df, a.df.class)
 }
 \arguments{
-\item{string}{}
+\item{string}{a vector.}
 
-\item{a.df}{}
+\item{a.df}{a data.frame}
+
+\item{a.df.class}{class of data.frame}
 }
 \value{
 

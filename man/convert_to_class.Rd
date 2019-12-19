@@ -7,9 +7,9 @@
 convert_to_class(a.input, class)
 }
 \arguments{
-\item{a.input}{}
+\item{a.input}{a vector}
 
-\item{class}{}
+\item{class}{a class}
 }
 \value{
 the vector transformed to class

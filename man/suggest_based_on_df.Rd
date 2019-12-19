@@ -6,6 +6,12 @@
 \usage{
 suggest_based_on_df(string, tab = TRUE)
 }
+\arguments{
+\item{string}{a vector}
+}
+\value{
+
+}
 \description{
 suggest_based_on_df
 }

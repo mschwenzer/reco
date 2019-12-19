@@ -7,7 +7,7 @@
 set_a.df(val)
 }
 \arguments{
-\item{string}{}
+\item{string}{a vector}
 }
 \value{
 Null

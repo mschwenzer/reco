@@ -7,11 +7,13 @@
 generate_recode_code(a.df, df_from_class, df_to_class, not.matching)
 }
 \arguments{
-\item{a.df}{}
+\item{a.df}{a data.frame}
 
-\item{df_from_class}{}
+\item{df_from_class}{class of from column in data.frame}
 
-\item{df_to_class}{}
+\item{df_to_class}{class of to column in data.frame}
+
+\item{not.matching}{elements in replacements that was not in the orig vector}
 }
 \value{
 

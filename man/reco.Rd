@@ -4,8 +4,15 @@
 \alias{reco}
 \title{reco}
 \usage{
-reco(input = NULL, replacements, interactive = FALSE, tab = FALSE,
-  class = NULL, not.matching = NULL)
+reco(
+  input = NULL,
+  replacements,
+  interactive = FALSE,
+  tab = FALSE,
+  class = NULL,
+  not.matching = NULL,
+  reptab = TRUE
+)
 }
 \arguments{
 \item{input}{A input vector having class `character`, `numeric`, `integer`, `factor`.}
@@ -26,6 +33,8 @@ If the data.frame does not have columns named from and to it will use the first 
 \item{tab}{Wheter to print the tab of alternatives/categories in every step.}
 
 \item{class}{The desired class of the output vector.}
+
+\item{reptab}{Wheter to print an overview of replacement tabs. Default TRUE but since it depends on stargazer you might decide turn it off in a batched sequence of replacements to save time or keep the output shorteri.}
 }
 \value{
 a vector of same class as replaments' `to` column or specified by the `class` argument.

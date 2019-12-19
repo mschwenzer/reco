@@ -1,9 +1,12 @@
+# * Logic Overview
+## main functino: reco
+
 # * validate_string_and_return_class
 # ##' validate_string_and_return_class.. content for \description{} (no empty lines) ..
 # ##'
 # ##' validate_string_and_return_class
 # ##' @title validate_string_and_return_class
-# ##' @param string 
+# ##' @param string a vector.
 # ##' @return 
 # ##' @author Marc Schwenzer
 validate_string_and_return_class<- function(string)
@@ -16,7 +19,7 @@ validate_string_and_return_class<- function(string)
 ##'
 ##' ##' get_a.df
 ##' @keywords internal
-##' @param string 
+##' @param string a vector
 ##' @return a.df  
 ##' @author Marc Schwenzer
 ##' @importFrom dplyr %>% 
@@ -30,7 +33,7 @@ get('a.df',inherits='TRUE')
 ##'
 ##' 
 ##' @title set_a.df
-##' @param string 
+##' @param string a vector
 ##' @keywords internal
 ##' @return Null
 ##' @author Marc Schwenzer
@@ -129,7 +132,7 @@ reco_filters <- function(x)
 ##' Load a data.frame or return NULL.
 ##'
 ##' @title load_file_or_create_it
-##' @param file 
+##' @param file A file
 ##' @return NULL
 ##' @author Marc Schwenzer
 ##' @keywords internal
@@ -159,8 +162,8 @@ load_df_or_create_it <- function(file)
 ##'
 ##' decide if ask_string_write_to_file is necessary
 ##' @title reco_do
-##' @param string 
-##' @param a.df
+##' @param string a vector
+##' @param a.df a data.frame
 ##' @keywords internal
 ##' @return 
 ##' @author Marc Schwenzer
@@ -183,7 +186,7 @@ reco_do <- function(string,tab=TRUE)
 ##'
 ##' ask_string_write_to_file
 ##' @title ask_string_write_to_file
-##' @param string
+##' @param string a vector
 ##' @keywords internal
 ##' @return 
 ##' @author Marc Schwenzer
@@ -218,7 +221,7 @@ ask_string_write_to_file<- function(string,tab=TRUE){
 ##'
 ##' suggest_based_on_df
 ##' @title suggest_based_on_df
-##' @param string
+##' @param string a vector
 ##' @keywords internal
 ##' @return 
 ##' @author Marc Schwenzer
@@ -243,7 +246,7 @@ suggest_based_on_df <- function(string,tab=TRUE)
     '' -> input
             scan(what=character(),nlines=1) -> input
     if(length(input)>1){paste0(input,collapse=' ') -> input}
-    if(input %>% length %>% `>`(0))
+    if(length(input)>0)
         {
     if(input  %>% as.numeric %>% is.na  %>% `!`)
     {
@@ -284,6 +287,7 @@ suggest_based_on_df <- function(string,tab=TRUE)
 ##' If the data.frame does not have columns named from and to it will use the first or second column but warn you.\cr
 ##' @param interactive If true an interactive coding session to add recodigs written to file, otherwise the recoding is done just base on the file leaving it as it is. The interactive coding session presents a table of alternatives. One can either enter a new string defining a new category to which the current value is assigned or just enter a number that selects one of the previous categories. Entering 0 adds the current value as category. Entering '' (just return) ignores the current value.
 ##' @param tab Wheter to print the tab of alternatives/categories in every step.
+##' @param reptab Wheter to print an overview of replacement tabs. Default TRUE but since it depends on stargazer you might decide turn it off in a batched sequence of replacements to save time or keep the output shorteri.
 ##' @param class The desired class of the output vector. 
 ##' @return a vector of same class as replaments' `to` column or specified by the `class` argument.
 ##' @author Marc Schwenzer
@@ -291,58 +295,68 @@ suggest_based_on_df <- function(string,tab=TRUE)
 ##' @importFrom purrr map
 ##' @importFrom dplyr mutate_if
 ##' @importFrom dplyr %>% 
-reco <- function(input=NULL,replacements,interactive=FALSE,tab=FALSE,class=NULL,not.matching=NULL)
+reco <- function(input=NULL,replacements,interactive=FALSE,tab=FALSE,class=NULL,not.matching=NULL,reptab=TRUE)
 {
 # ** init variables
-    '' -> the_source 
+'' -> the_source 
    
 
-# ** ◼ Consoliadate replacement frame:  Switch based on several options
+# ** ◼ Argument replacement: Switch based on various type and 
+# *** Replacements is `list`
+# **** {
 if(replacements %>% is.list)
     {
-# *** --- Lists        
-                                        # list
+# **** Option 1: replacements is `data.frame`: Use this data.frame as replacement table                    
         if(replacements %>% is.data.frame)
         {
-# *** Option 1: data.frame            
+
                                         # Option 1: A data.frame given directly            
             paste0('data.frame `',paste0(deparse(substitute(replacements)),collapse=''),'`')  -> the_source
             interactive=FALSE
             replacements %>% as.data.frame %>% set_a.df
         }
         else
-
-
-# *** Option 2: list not data.frame: else recursively call reco            
-            # recursively call reco
-            # TODO
+# **** Option 2: replacements is `list`, but not `data.frame`: recursively call reco
+# ***** {            
         {
+# ***** Repeatedly execute the reco function on input                     
+# TODO: report the name (orig calling condition) when first calling
             while(TRUE)
                 {
-            input %>% reco(replacements=replacements[[1]],interactive=interactive,tab=tab,not.matching=not.matching) -> input
+
+
+                    input %>% reco(replacements=replacements[[1]],interactive=interactive,tab=tab,not.matching=not.matching,reptab=reptab) -> input
 #            print(replacements);print(length(replacements))
+# ***** if replacements `list` contains only one remaining element quit the process and return new vector
                         if(length(replacements)==1){
+# ****** Change the class of the output if specified in the `class` argument before returning vector
                             if(!is.null(class)){
-    if(class!=(class(input))){
-    input %>% convert_to_class(desired_output_class) -> input
-    }
-    }
-
-return(input)}
-                        if(length(replacements)>1){replacements[-1] -> replacements}
-
-            
-            }
+                                if(class!=(class(input))){
+                                    input %>% convert_to_class(desired_output_class) -> input
+                                }
+                            }
+# ****** break from while by returning input and                             
+                            return(input)}
+                    if(length(replacements)>1){replacements[-1] -> replacements}
+                }
+# ****** Exit from the whole reco function because all list replacements-objects have been processesd
             return(input)
-            }
+# ***** }
+        }
+        
+# **** }        
     }
+# *** replacements is not `list`
 else
+# *** {
     {
-if(replacements %>% is.character)
-    {
-# *** --- is.character        
+# *** replacements is `character`: matching df stored in reco package?, 'labels'?, file?
+# **** {        
+        if(replacements %>% is.character)
+        {
+# **** length(replacements==1)            
         if(length(replacements)==1)
-# *** Option 3: A replacement data.frame stored in the reco package
+# **** Option 3: A replacement data.frame stored in the reco package
             if(replacements%in%(data(package='reco')$results[,'Item'] %>% c))
             {
                 paste0('default replacement data.frame `',replacements,'` from reco package')  -> the_source                                  
@@ -352,7 +366,7 @@ if(replacements %>% is.character)
             }
             else
         {
-# *** Option 4: recode labels from attribute
+# **** Option 4: recode labels from attribute
             if(replacements=='labels')
             {
 
@@ -378,48 +392,49 @@ if(replacements %>% is.character)
             }
             else
             {
-# *** Option 5: A file
+# **** Option 5: path to existing file
                 paste0('replacement file `',replacements,'`')  -> the_source                                  
                 load_df_or_create_it(replacements)  %>% set_a.df
             }
-         }   
+         }
         }
 else
     {
 # *** none of options 3-5 → error        
         stop("Argument `replacements` is of class `character`, but it's length is > 1.\nYou can use the path to a file, a default replacement data.frame, or the 'labels' option. Whatever you wanted to do, replacements needs to be of length 1. If you want to call reco recursively give a list of elements to replacements.")
         }
+# *** }        
      }
-
-    
+# ** replacements given
 # ** ◼ Validation of data.frame and class settings
 class -> desired_output_class
 rm(class)
 ####
-        validate_string_and_return_class(input) -> input_class
-        a.df %>% validate_df_structure -> a.df
-    a.df[[2]] -> a.df.class
-    a.df[[3]] -> a.df.warning    
-    a.df[[1]] -> a.df
+validate_string_and_return_class(input) -> input_class
+a.df %>% validate_df_structure -> a.df
+a.df[[2]] -> a.df.class
+a.df[[3]] -> a.df.warning    
+a.df[[1]] -> a.df
 # ** ◼ Switch to just view the data.frame
 #    stop('No readable source to find replacements')
     if(is.null(input)){return(a.df)}
 
 # ** Print info
-
-                                get('lhs',envir=parent.frame(6))  -> varname
-                                varname %>% as.character -> varname
-    if(length(varname)>1){'input' -> varname}
-    cat(paste0('- reco> replace `',varname,'` based on ',the_source,'.\n',if(a.df.warning[1]!=''){paste0('       ',a.df.warning)},collapse=''))
-    
+input %>% reco_filters  %>% unique  ->  x
+get_a.df()[,1]%in%    x -> matched.values
+get('lhs',envir=parent.frame(6))  -> varname
+varname %>% as.character -> varname
+if(length(varname)>1){'input' -> varname}
+cat(paste0('- reco> replace `',varname,'` based on ',the_source,'',if(a.df.warning[1]!=''){paste0('       ',a.df.warning)},collapse=''))
+if(reptab){cat(':\n');visualize_replacement_table(replacements,matched.values=matched.values)}
+    else{cat('.\n')}
 # ** ◼  Interactive Coding session
-            input %>% reco_filters  %>% unique  ->  x
-            x%in%get_a.df()[,1] %>% sum ->n_matched
+    x%in%get_a.df()[,1]  %>% sum ->n_matched
             n_matched    %>% `-`(length(x),.) -> n_torecode
     if ((!interactive)&(n_torecode>0))
         {
             if(n_torecode) {
-                cat(paste0('        ',n_torecode,' value(s) of ',length(x),' unique values could not be matched, keeping orig vals:\n'))
+                cat(paste0('  !!! ',n_torecode,' value',if(n_torecode>1){'s'},' of ',length(x),' unique vals could not be matched, keeping orig vals:\n'))
                 x[((x%in%get_a.df()[,1]) %>% `!` %>% which)] %>% unique %>%
                     {
                         . -> x
@@ -431,7 +446,7 @@ rm(class)
                             {
                                 x[1:10] -> vals
                                 }
-                        vals %>% sort %>% paste0('`',.,'`',collapse=', ') %>% paste0('        e.g. ',.,'\n') %>% cat
+                        vals %>% sort %>% paste0('`',.,'`',collapse=', ') %>% paste0('      e.g. ',.,'\n') %>% cat
 }
             }
             }
@@ -446,7 +461,7 @@ rm(class)
         }
 # ** Prepare replacement frame and input to match logic of dplyr::recode
 a.df %>% mutate_if(is.logical,as.double) -> a.df
-        # *** Set all classes
+# *** Set all classes
     input %>% class -> input_class
     a.df.class[1] -> df_from_class
     a.df.class[2] -> df_to_class
@@ -544,6 +559,7 @@ a.df[-to.drop.from.a.df,] -> a.df
 
     eval(parse(text=code))
 #        cat(paste0('\nout: ',(class(input)),'\n'))
+# ****** Change the class of the output if specified in the `class` argument before returning vector
     if(desired_output_class!=(class(input))){
     input %>% convert_to_class(desired_output_class) -> input
     }
@@ -569,13 +585,13 @@ df %>% as.data.frame %>% {
 q %>% str_replace_all(rep.patterns)
 }
 # * DEPRECIATED reco_replace_character
-##' .. content for \description{} (no empty lines) ..
+##' reco_replace_character
 ##'
-##' .. content for \details{} ..
-##' @title 
-##' @param string 
-##' @param a.df 
-##' @param a.df.class
+##' reco_replace_character
+##' @title reco_replace_character
+##' @param string a vector.
+##' @param a.df a data.frame
+##' @param a.df.class class of data.frame
 ##' @importFrom dplyr mutate
 ##' @return 
 ##' @author Marc Schwenzer
@@ -616,21 +632,20 @@ reco_replace_numeric<- function(string,a.df,a.df.class)
 
 
 
-# * generate_recode_code: generate code for dplyr recode.
-##' .. content for \description{} (no empty lines) ..
+# * generate_recode_code: generate code for dplyr::recode.
+##' generate_recode_code
 ##'
-##' .. content for \details{} ..
-##' @title 
-##' @param a.df 
-##' @param df_from_class 
-##' @param df_to_class 
-##' @param not.matching
+##' generate code for dplyr::recode.
+##' @title generate_recode_code
+##' @param a.df a data.frame
+##' @param df_from_class class of from column in data.frame 
+##' @param df_to_class class of to column in data.frame
+##' @param not.matching elements in replacements that was not in the orig vector
 ##' @importFrom stringr str_replace_all
 ##' @return 
 ##' @author Marc Schwenzer
 generate_recode_code<- function(a.df,df_from_class,df_to_class,not.matching)
 {
-
     # missing replacement for character
     paste0('`',
            a.df$from,'`='
@@ -660,12 +675,19 @@ str_replace_all(regex('="*NA[L]*"*$'),paste0('=',switch(df_to_class,
                     . )} -> code
 
     code %>%  paste('input %>%  dplyr::recode(.,',.,')  -> input')  -> code
-#print(code)
+code
     }
 
 
-
-    convert_to_class<- function(a.input,class){
+##' convert_to_class
+##'
+##' Convert a input vector to according class. (Internal helper function of reco.)
+##' @title convert_to_class
+##' @param a.input a vector
+##' @param class a class
+##' @return the vector transformed to class
+##' @author Marc Schwenzer
+convert_to_class<- function(a.input,class){
         switch(class,
                numeric={a.input %>% as.numeric -> a.input},
                character={a.input %>% as.character -> a.input},
@@ -692,6 +714,43 @@ guarantee_numeric_are_same_class <- function(input,a.df)
             }
     return(list(input,a.df))
     }
+# * visualize_replacement_table
+##' visualize_replacement_table
+##'
+##' Visualizer for replacemenent table based on stargazer
+##' @title visualize_replacement_table
+##' @param replacements the replacements data.frame
+##' @param type horizontal or vertical based on tab argument of reco
+##' @return 
+##' @author Marc Schwenzer
+##' @importFrom stringr str_trunc
+##' @importFrom stargazer stargazer
+##' @importFrom dplyr %>%
+visualize_replacement_table<- function(replacements,type='vertical',matched.values=matched.values)
+    {
+options()$width -> n_dis_char
+
+n_dis_char - 4
+if(type=='horizontal'){
+replacements %>% head(30) %>% transmute(f,` `='->',t) %>% as.matrix %>% stargazer(type='text')
+}
+# vertical
+if(type=='vertical'){
+capture.output(replacements %>% filter(matched.values) %>% transmute(f,`  `='|',` `='v',t) %>% t %>% stargazer(type='text',rownames=FALSE)  ) %>% .[-c(1:2,length(.))]  -> output
+output %>% nchar %>% max -> n_char_max
+# *** If number display chars are lower than the string path cut into two pieces and truncate middle values
+if((n_char_max )>n_dis_char)
+{
+paste0('  ',output %>% stringr::str_trunc((n_dis_char/2)-3,'right'),output %>% stringr::str_trunc((n_dis_char/2)-3,'left'),sep='') %>% paste0(.,collapse='\n') %>% paste0('\n') %>% cat
+             cat('\n')
+}
+else{
+         paste0('  ',output) %>% cat(sep='\n')
+         cat('\n')
+        }
+}
+return()
+}
 # * Filevars
 # Local Variables:
 # orgstruct-heading-prefix-regexp: "# "

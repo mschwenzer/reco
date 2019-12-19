@@ -6,6 +6,12 @@
 \usage{
 ask_string_write_to_file(string, tab = TRUE)
 }
+\arguments{
+\item{string}{a vector}
+}
+\value{
+
+}
 \description{
 ask_string_write_to_file
 }
