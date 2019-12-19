@@ -11,7 +11,7 @@ Description: The function `reco` is a swiss army tool for value recoding (rule-b
 - It offers several alternatives to specify such rules of replacement, either by using a data.frame, a file, default replacement sets or the label attribute of the input vector.
 - It comes with convenience functions to convert classes and monitor the resulting changes.
 - It can also be used in an interactive mode to create such replacement rules on the fly. One can either start with a predefined data.frame of replacement alternatives to select from or create such a data.frame from the scratch and record it to a replacement file.
-- When replacements are provided as list that is not a data.frmae, a chain of sequential replacements is executed on the vector.
+- When replacements are provided as list that is not a `data.frame`, a chain of sequential replacements is executed on the vector.
 - It additionally provides some default replacement lists for standard tasks.
 - Conceptually `reco` is not implementing new replacement functionalities but just a wrapper that calls other function to do the work, like e.g. dplyr::recode.
 License: GPL-3
