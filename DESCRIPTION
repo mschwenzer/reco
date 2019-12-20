@@ -8,12 +8,12 @@ Authors@R:
            email = "m.schwenzer@uni-tuebingen.de",
            comment = c(ORCID = "https://orcid.org/0000-0003-3683-3058"))
 Description: The function `reco` is a swiss army tool for value recoding (rule-based replacement of vector elements). 
-- It offers several alternatives to specify such rules of replacement, either by using a data.frame, a file, default replacement sets or the label attribute of the input vector.
-- It comes with convenience functions to convert classes and monitor the resulting changes.
-- It can also be used in an interactive mode to create such replacement rules on the fly. One can either start with a predefined data.frame of replacement alternatives to select from or create such a data.frame from the scratch and record it to a replacement file.
-- When replacements are provided as list that is not a `data.frame`, a chain of sequential replacements is executed on the vector.
-- It additionally provides some default replacement lists for standard tasks.
-- Conceptually `reco` is not implementing new replacement functionalities but just a wrapper that calls other function to do the work, like e.g. dplyr::recode.
+ - It offers several alternatives to specify such rules of replacement, either by using a data.frame, replacement rules that mimic the syntax in Stata's recode and hmisc:recode hmisc-package, a file, default replacement sets or the label attribute of the input vector.
+ - It comes with convenience functions to convert classes and monitor the resulting changes.
+ - It can also be used in an interactive mode to create such replacement rules on the fly. One can either start with a predefined data.frame of replacement alternatives to select from or create such a data.frame from the scratch and record it to a replacement file.
+ - When replacements are provided as list that is not a `data.frame`, a chain of sequential replacements is executed on the vector.
+ - It additionally provides some default replacement lists for standard tasks.
+ - Conceptually `reco` is not implementing new replacement functionalities but just a wrapper that calls other function to do the work, like e.g. dplyr::recode.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

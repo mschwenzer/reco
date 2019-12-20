@@ -1,6 +1,5 @@
 # * Logic Overview
-## main functino: reco
-
+## main function: reco
 # * validate_string_and_return_class
 # ##' validate_string_and_return_class.. content for \description{} (no empty lines) ..
 # ##'
@@ -81,7 +80,7 @@ validate_df_structure <- function(df)
         df %>% select(fromcol,tocol)  %>% unique-> df
         duplicated(df$from) %>% which  -> duplicates
         if(length(duplicates)>0){
-        print(df[duplicates,])
+        #print(df[duplicates,])
         duplicates %>% map(~{
             (df$from%in%df$from[.x]) %>% which -> conflicting.rows
             df$from[conflicting.rows] %>% unique -> conflicting.froms
@@ -90,10 +89,10 @@ validate_df_structure <- function(df)
             (df$from%in%.x) %>% which -> confl.rows
 #            print(confl.rows)
             paste0(confl.rows %>% df$to[.] ,collapse=', ') -> rep.str
-            paste0('\n',((df$from[confl.rows])[1]),' -> ',rep.str)})
+            paste0('\n       ',((df$from[confl.rows])[1]),' -> ',rep.str)})
             })         %>% paste0(collapse='')     -> error
         
-            paste0('Duplicate original value (from column in replacement data.frame) with conflicting replacement values (to column):',error) -> error
+            paste0('Conflicting replacement values.\n       The same input value was specified to be mapped to more than one output value:',error) -> error
         stop(error,call.=FALSE)
         }
         df %>% map_chr(~class(.)) -> df.class
@@ -277,6 +276,7 @@ suggest_based_on_df <- function(string,tab=TRUE)
 ##' @param input A input vector having class `character`, `numeric`, `integer`, `factor`.
 ##' @param replacements This argument defines how to replace values. The basic structure is a data.frame expected to have the columns f(rom) and t(o).\cr\cr
 ##' If replacements is not a data.frame, there are several options:\cr
+##' - If replacements is a string containing replacement rules specified in brackets `(1=2) (2/4=1)` (analogous to Stata) or comma-separated rules `1:2='ok',3='heinz',4:7=2`` they will be evaluated accordingly.
 ##' - If replacements is a string with a path to a file readable by rio::import where the data.frame replacements are located.\cr
 ##' - If replacements is the string 'labels' it will use the attributes() function to extract the labels-attribute, effectively replacing values by there corresponding labels (which e.g. are generated automatically when importing from Stata, SPSS, etc.).\cr
 ##' - If replacements is a string that describes a data.frame in the reco package this will be used as replacement data.frame. See data(packages='reco') for the default data.frames.\cr
@@ -293,6 +293,7 @@ suggest_based_on_df <- function(string,tab=TRUE)
 ##' @author Marc Schwenzer
 ##' @export
 ##' @importFrom purrr map
+##' @importFrom dplyr filter
 ##' @importFrom dplyr mutate_if
 ##' @importFrom dplyr %>% 
 reco <- function(input=NULL,replacements,interactive=FALSE,tab=FALSE,class=NULL,not.matching=NULL,reptab=TRUE)
@@ -391,20 +392,48 @@ else
 
             }
             else
+                {
+### Replacement rules                    
+                if(replacements %>% str_detect('\\(|\\)|\\,|\\='))
+                    {
+ #                       print(                        replacements %>% st_to_df)
+                        replacements %>% st_to_df ->a
+                        if(str_detect(a[,1],'_max') %>% sum)
+                            {
+                            max(input) -> a[a[,1]=='_max',1]
+                                              }
+                        if(str_detect(a[,2],'_max') %>% sum)
+                            {
+                            max(input) -> a[a[,2]=='_max',2]
+                                              }
+                        if(str_detect(a[,1],'_min') %>% sum)
+                        {
+                            min(input) -> a[a[,1]=='_min',1]
+                            }
+                        if(str_detect(a[,2],'_min') %>% sum)
+                        {
+                            min(input) -> a[a[,2]=='_min',2]
+                            }
+                            a %>% set_a.df
+                        ### Convert to numeric if all values are convertable to numeric
+#                        browser()
+                    }
+                    else
             {
 # **** Option 5: path to existing file
                 paste0('replacement file `',replacements,'`')  -> the_source                                  
                 load_df_or_create_it(replacements)  %>% set_a.df
-            }
+            }}
          }
         }
 else
     {
 # *** none of options 3-5 → error        
-        stop("Argument `replacements` is of class `character`, but it's length is > 1.\nYou can use the path to a file, a default replacement data.frame, or the 'labels' option. Whatever you wanted to do, replacements needs to be of length 1. If you want to call reco recursively give a list of elements to replacements.")
+        stop("Argument `replacements` is of class `character`, but it's length is > 1.\nYou can use a recoding rule, the path to a file, a default replacement data.frame, or the 'labels' option. Whatever you wanted to do, replacements needs to be of length 1. If you want to call reco recursively use a list of replacement specifications.")
         }
 # *** }        
      }
+
 # ** replacements given
 # ** ◼ Validation of data.frame and class settings
 class -> desired_output_class
@@ -426,7 +455,7 @@ get('lhs',envir=parent.frame(6))  -> varname
 varname %>% as.character -> varname
 if(length(varname)>1){'input' -> varname}
 cat(paste0('- reco> replace `',varname,'` based on ',the_source,'',if(a.df.warning[1]!=''){paste0('       ',a.df.warning)},collapse=''))
-if(reptab){cat(':\n');visualize_replacement_table(replacements,matched.values=matched.values)}
+if(reptab){cat(':\n');visualize_replacement_table(get_a.df(),matched.values=matched.values)}
     else{cat('.\n')}
 # ** ◼  Interactive Coding session
     x%in%get_a.df()[,1]  %>% sum ->n_matched
@@ -728,15 +757,17 @@ guarantee_numeric_are_same_class <- function(input,a.df)
 ##' @importFrom dplyr %>%
 visualize_replacement_table<- function(replacements,type='vertical',matched.values=matched.values)
     {
+c('f','t') -> names(replacements)
 options()$width -> n_dis_char
-
 n_dis_char - 4
 if(type=='horizontal'){
 replacements %>% head(30) %>% transmute(f,` `='->',t) %>% as.matrix %>% stargazer(type='text')
 }
 # vertical
 if(type=='vertical'){
-capture.output(replacements %>% filter(matched.values) %>% transmute(f,`  `='|',` `='v',t) %>% t %>% stargazer(type='text',rownames=FALSE)  ) %>% .[-c(1:2,length(.))]  -> output
+if(length(matched.values)>0)
+    {replacements %>% dplyr::filter(matched.values)     -> replacements}
+capture.output(replacements %>% transmute(f,`  `='|',` `='v',t) %>% t %>% stargazer(type='text',rownames=FALSE)  ) %>% .[-c(1:2,length(.))]  -> output
 output %>% nchar %>% max -> n_char_max
 # *** If number display chars are lower than the string path cut into two pieces and truncate middle values
 if((n_char_max )>n_dis_char)
@@ -751,6 +782,34 @@ else{
 }
 return()
 }
+
+##' st_to_df
+##'
+##' Parse bracket-based rule specification
+##' @title st_to_df
+##' @param rule 
+##' @return 
+##' @author Marc Schwenzer
+##' @export
+st_to_df<- function(rules)
+    {
+rules %>%
+### Cut by brackets or commas
+    str_split('\\(|\\)|,') %>%unlist %>%
+### Remove empty elements
+    {.[!str_detect(.,'^$')]}  %>%
+### Replace stata interval char `/` by R interval char `:`
+    str_replace_all('/',':')   %>%
+### Replace min by _min
+    str_replace_all('min','_min')   %>%    
+### Replace min by _max
+    str_replace_all('max','_max')      -> rules
+        rules %>% str_split('=')%>% {NULL -> rownames(.);.}  %>% do.call('rbind',.) %>% data.frame %>% {names(.)<- c('f','t');.}  %>% arrange(f) -> out
+return(out)
+        }
+
+
+
 # * Filevars
 # Local Variables:
 # orgstruct-heading-prefix-regexp: "# "

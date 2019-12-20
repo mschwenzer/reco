@@ -19,6 +19,7 @@ reco(
 
 \item{replacements}{This argument defines how to replace values. The basic structure is a data.frame expected to have the columns f(rom) and t(o).\cr\cr
 If replacements is not a data.frame, there are several options:\cr
+- If replacements is a string containing replacement rules specified in brackets `(1=2) (2/4=1)` (analogous to Stata) or comma-separated rules `1:2='ok',3='heinz',4:7=2`` they will be evaluated accordingly.
 - If replacements is a string with a path to a file readable by rio::import where the data.frame replacements are located.\cr
 - If replacements is the string 'labels' it will use the attributes() function to extract the labels-attribute, effectively replacing values by there corresponding labels (which e.g. are generated automatically when importing from Stata, SPSS, etc.).\cr
 - If replacements is a string that describes a data.frame in the reco package this will be used as replacement data.frame. See data(packages='reco') for the default data.frames.\cr
